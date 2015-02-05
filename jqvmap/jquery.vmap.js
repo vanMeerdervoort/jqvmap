@@ -452,27 +452,42 @@
       }
     });
 
-    jQuery(params.container).delegate(this.canvas.mode == 'svg' ? 'path' : 'shape', 'click', function (e) {
-      if (!params.multiSelectRegion) {
-        for (var key in mapData.pathes) {
-          map.countries[key].currentFillColor = map.countries[key].getOriginalFill();
-          map.countries[key].setFill(map.countries[key].getOriginalFill());
-        }
+    jQuery(params.container).delegate(this.canvas.mode == 'svg' ? 'path' : 'shape', 'mousedown mouseup', function (e) {
+            
+      var PageCoords;
+      if (e.type == 'mousedown') {
+        pageCoords = event.pageX + "." + event.pageY;
       }
+      if (e.type == 'mouseup') {
+         var pageCoords2 = event.pageX + "." + event.pageY;
 
-      var path = e.target;
-      var code = e.target.id.split('_').pop();
+         if (pageCoords == pageCoords2) {
 
-      jQuery(params.container).trigger('regionClick.jqvmap', [code, mapData.pathes[code].name]);
-      if (!regionClickEvent.isDefaultPrevented()) {
-        if (map.selectedRegions.indexOf(code) !== -1) {
-          map.deselect(code, path);
-        } else {
-          map.select(code, path);
-        }
+         //we have a click. Do the ClickEvent
+            if (!params.multiSelectRegion) {
+              for (var key in mapData.pathes) {
+                map.countries[key].currentFillColor = map.countries[key].getOriginalFill();
+                map.countries[key].setFill(map.countries[key].getOriginalFill());
+              }
+            }
+
+            var path = e.target;
+            var code = e.target.id.split('_').pop();
+
+            regionClickEvent = $.Event('regionClick.jqvmap');
+
+            jQuery(params.container).trigger('regionClick.jqvmap', [code, mapData.pathes[code].name]);
+
+            if (!regionClickEvent.isDefaultPrevented()) {
+                if (map.selectedRegions.indexOf(code) !== -1) {
+                  map.deselect(code, path);
+                } else {
+                   map.select(code, path);
+                }
+            }
+          } 
+                   
       }
-
-      //console.log(selectedRegions);
 
     });
 
